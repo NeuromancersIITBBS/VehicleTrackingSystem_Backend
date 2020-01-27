@@ -1,8 +1,8 @@
 const adminRouter = require('express').Router();
-let driverList = require('driverCreationRouter').driverList;
-let requestDriverList = require('driverCreationRouter').requestDriverList;
+let driverList = require('./driverCreationRouter').driverList;
+let requestDriverList = require('./driverCreationRouter').requestDriverList;
 let driverUtils = require('../utils/DriverCreationUtils');
-let  Driver = require('driverCreationRouter').Driver;
+let  Driver = require('./driverCreationRouter').Driver;
 
 
 adminRouter.get('/allDrivers',(req,res)=>{

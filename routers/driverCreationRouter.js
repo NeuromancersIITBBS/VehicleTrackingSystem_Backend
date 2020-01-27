@@ -12,6 +12,12 @@ class Driver{
     }
 }
 
+// Test routine
+driverCreationRouter.get('/hello', (req,res)=>{
+    res.send("Welcome to driver creation");
+});
+
+
 driverCreationRouter.post('/forgotPassword', (req,res)=>{
     const phoneNumber = req.body.phoneNumber;
     if(!driverList.find((driver) => driver.phoneNumber == phoneNumber )){
@@ -56,8 +62,6 @@ driverCreationRouter.post('/logout',(req,res)=>{
     driver.isActive = false;
     res.status(200).send("logout is successful");
 });
-
-
 
 module.exports.router = driverCreationRouter;
 module.exports.driverList = driverList;
