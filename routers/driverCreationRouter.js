@@ -1,5 +1,5 @@
 const driverCreationRouter = require('express').Router();
-
+console.log("I am here in driverCreation");
 let driverList = [];
 let requestDriverList = [];
 
