@@ -13,7 +13,7 @@ POST http://localhost:3000/vts/new_driver/register
 content-type: application/json
 
 {
-    "name": "XYZ",
+    "driverName": "XYZ",
     "phoneNumber": "53466565547",
     "password": "!@#$"
 }
@@ -24,7 +24,7 @@ POST http://localhost:3000/vts/new_driver/forgotPassword
 content-type: application/json
 
 {
-    "name": "XYZ",
+    "driverName": "XYZ",
     "phoneNumber": "53466565547",
     "password": "!@#$"
 }
@@ -35,7 +35,7 @@ POST http://localhost:3000/vts/new_driver/login
 content-type: application/json
 
 {
-    "name": "XYZ",
+    "driverName": "XYZ",
     "phoneNumber": "53466565547",
     "password": "!@#$"
 }
@@ -46,7 +46,7 @@ POST http://localhost:3000/vts/new_driver/logout
 content-type: application/json
 
 {
-    "name": "XYZ",
+    "driverName": "XYZ",
     "phoneNumber": "53466565547",
     "password": "!@#$"
 }
@@ -66,7 +66,16 @@ DELETE http://localhost:3000/vts/admin/deleteDriver
 content-type: application/json
 
 {
-    "name": "XYZ",
+    "driverName": "XYZ",
     "phoneNumber": "53466565547",
     "password": "!@#$"
+}
+
+
+### Verified driver
+POST http://localhost:3000/vts/admin/DriverVerified
+content-type: application/json
+
+{
+    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "53466565547", "password": "!@#$"}]
 }

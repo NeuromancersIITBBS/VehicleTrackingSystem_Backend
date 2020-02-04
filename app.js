@@ -9,6 +9,6 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/vts/new_driver', driverCreationRouter);
-app.use('vts/admin',adminRouter);
+app.use('/vts/admin',adminRouter);
 
 module.exports= app;
