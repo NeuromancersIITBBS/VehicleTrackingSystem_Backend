@@ -1,1 +1,1 @@
-[{"driverName":"XYZ","password":"!@#$","phoneNumber":"53466565547","isActive":false}]
+[{"driverName":"XYZ","password":"!@#$","phoneNumber":"53466565547","isActive":false},{"driverName":"ABC","password":"myPass!!!","phoneNumber":"1234567890","isActive":false}]

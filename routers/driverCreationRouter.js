@@ -5,7 +5,17 @@ let driverList = [];
 let requestDriverList = [];
 
 // Fetch the existing list of the drivers
-driverUtils.readDriversFromDB().then((data) => {driverList = JSON.parse(data);});
+driverUtils.readDriversFromDB().then((data) => {
+    if(!data) return;
+    // note:  refernce of the driverList must not change
+    let driversDB = JSON.parse(data);
+    driversDB.forEach((driver) => {
+        driverList.push(driver);
+    });
+}).catch((err) => {
+    console.log('Retrival of drivers from db failed!');
+    console.log(err);
+});
 
 class Driver{
     constructor(driverName, number, password){
@@ -39,6 +49,10 @@ driverCreationRouter.post('/register',async (req,res)=>{
     const password = req.body.password;
     if(driverList.find((driver) => driver.phoneNumber === phoneNumber )){
         res.status(406).send("Driver already exists. Kindly login. ");
+        return;
+    }
+    else if(requestDriverList.find((driver) => driver.phoneNumber === phoneNumber )){
+        res.status(406).send("Driver already registerd once. Kindly wait for the verification. ");
         return;
     }
     let driver = new Driver(driverName,phoneNumber,password);
