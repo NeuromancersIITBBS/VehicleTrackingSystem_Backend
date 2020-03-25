@@ -13,9 +13,9 @@ POST http://localhost:3000/vts/new_driver/register
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
 
 
@@ -24,9 +24,9 @@ POST http://localhost:3000/vts/new_driver/forgotPassword
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
 
 
@@ -35,9 +35,9 @@ POST http://localhost:3000/vts/new_driver/login
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
 
 
@@ -46,11 +46,10 @@ POST http://localhost:3000/vts/new_driver/logout
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
-
 
 ### Get all drivers
 GET http://localhost:3000/vts/admin/allDrivers
@@ -65,9 +64,9 @@ DELETE http://localhost:3000/vts/admin/deleteDriver
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
 
 ### Reject new driver
@@ -75,9 +74,9 @@ DELETE http://localhost:3000/vts/admin/rejectDriver
 content-type: application/json
 
 {
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "driverName": "ABC",
+    "phoneNumber": "1234567890",
+    "password": "myPass!!!"
 }
 
 ### Verified driver
@@ -85,14 +84,5 @@ POST http://localhost:3000/vts/admin/DriverVerified
 content-type: application/json
 
 {
-    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "53466565547", "password": "!@#$"}]
-}
-
-### Verified all drivers
-POST http://localhost:3000/vts/admin/DriverVerified
-content-type: application/json
-
-{
-    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "53466565547", "password": "!@#$"},
-    {"driverName": "ABC", "phoneNumber": "1234567890", "password": "myPass!!!"}]
+    "verifiedDriverList": [{"driverName": "ABC", "phoneNumber": "1234567890", "password": "myPass!!!"}]
 }

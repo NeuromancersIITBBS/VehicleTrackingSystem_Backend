@@ -1,7 +1,21 @@
 const driverCreationRouter = require('express').Router();
+let driverUtils = require('../utils/DriverCreationUtils');
 
 let driverList = [];
 let requestDriverList = [];
+
+// Fetch the existing list of the drivers
+driverUtils.readDriversFromDB().then((data) => {
+    if(!data) return;
+    // note:  refernce of the driverList must not change
+    let driversDB = JSON.parse(data);
+    driversDB.forEach((driver) => {
+        driverList.push(driver);
+    });
+}).catch((err) => {
+    console.log('Retrival of drivers from db failed!');
+    console.log(err);
+});
 
 class Driver{
     constructor(driverName, number, password){
@@ -33,8 +47,13 @@ driverCreationRouter.post('/register',async (req,res)=>{
     const driverName = req.body.name;
     const phoneNumber = req.body.phoneNumber;
     const password = req.body.password;
-    if(driverList.find(({ driver }) => driver.phoneNumber === phoneNumber )){
-       res.status(406).send("Driver already exists. Kindly login. ")
+    if(driverList.find((driver) => driver.phoneNumber === phoneNumber )){
+        res.status(406).send("Driver already exists. Kindly login. ");
+        return;
+    }
+    else if(requestDriverList.find((driver) => driver.phoneNumber === phoneNumber )){
+        res.status(406).send("Driver already registerd once. Kindly wait for the verification. ");
+        return;
     }
     let driver = new Driver(driverName,phoneNumber,password);
     requestDriverList.push(driver);
@@ -45,7 +64,7 @@ driverCreationRouter.post('/login',(req,res)=>{
     const driverName = req.body.name;
     const phoneNumber = req.body.phoneNumber;
     const password = req.body.password;
-    let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber && driver.password===password );
+    let driver = driverList.find((driver) => driver.phoneNumber === phoneNumber && driver.password===password );
     if(!driver){
         res.status(406).send("Driver doesn't exist.");
         return;
@@ -56,7 +75,7 @@ driverCreationRouter.post('/login',(req,res)=>{
 
 driverCreationRouter.post('/logout',(req,res)=>{
     const phoneNumber = req.body.phoneNumber;
-    let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber );
+    let driver = driverList.find((driver) => driver.phoneNumber === phoneNumber );
     if(!driver){
         res.status(406).send("Driver doesn't exist.");
         return;
