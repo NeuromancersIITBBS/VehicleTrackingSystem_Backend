@@ -11,4 +11,14 @@ let updateDriversInDB  = function (driverList){
     }
 };
 
+let readDriversFromDB = () => {
+    try{
+        return fs.readFile('./DriverData/DriverList.txt', 'utf8');
+    } catch(err){
+        console.log("An error occured while reading the database");
+        throw err;
+    }
+};
+
 module.exports.updateDriversInDB = updateDriversInDB;
+module.exports.readDriversFromDB = readDriversFromDB;

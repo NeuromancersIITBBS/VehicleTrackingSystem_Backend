@@ -1,7 +1,11 @@
 const driverCreationRouter = require('express').Router();
+let driverUtils = require('../utils/DriverCreationUtils');
 
 let driverList = [];
 let requestDriverList = [];
+
+// Fetch the existing list of the drivers
+driverUtils.readDriversFromDB().then((data) => {driverList = JSON.parse(data);});
 
 class Driver{
     constructor(driverName, number, password){
@@ -33,8 +37,9 @@ driverCreationRouter.post('/register',async (req,res)=>{
     const driverName = req.body.name;
     const phoneNumber = req.body.phoneNumber;
     const password = req.body.password;
-    if(driverList.find(({ driver }) => driver.phoneNumber === phoneNumber )){
-       res.status(406).send("Driver already exists. Kindly login. ")
+    if(driverList.find((driver) => driver.phoneNumber === phoneNumber )){
+        res.status(406).send("Driver already exists. Kindly login. ");
+        return;
     }
     let driver = new Driver(driverName,phoneNumber,password);
     requestDriverList.push(driver);
@@ -45,7 +50,7 @@ driverCreationRouter.post('/login',(req,res)=>{
     const driverName = req.body.name;
     const phoneNumber = req.body.phoneNumber;
     const password = req.body.password;
-    let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber && driver.password===password );
+    let driver = driverList.find((driver) => driver.phoneNumber === phoneNumber && driver.password===password );
     if(!driver){
         res.status(406).send("Driver doesn't exist.");
         return;
@@ -56,7 +61,7 @@ driverCreationRouter.post('/login',(req,res)=>{
 
 driverCreationRouter.post('/logout',(req,res)=>{
     const phoneNumber = req.body.phoneNumber;
-    let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber );
+    let driver = driverList.find((driver) => driver.phoneNumber === phoneNumber );
     if(!driver){
         res.status(406).send("Driver doesn't exist.");
         return;

@@ -6,11 +6,15 @@ let  Driver = require('./driverCreationRouter').Driver;
 
 
 adminRouter.get('/allDrivers',(req,res)=>{
+    console.log('All Drivers');
+    console.log(driverList);
    res.status(200).send(driverList);
 });
+
 adminRouter.get('/getRequestedDrivers',(req,res)=>{
     res.send(requestDriverList)
 });
+
 adminRouter.post('/DriverVerified',async (req,res)=>{
     let verifiedDriverList = req.body.verifiedDriverList;
     for (const driver of verifiedDriverList){
