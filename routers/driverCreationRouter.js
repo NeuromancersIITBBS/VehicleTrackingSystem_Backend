@@ -1,5 +1,5 @@
 const driverCreationRouter = require('express').Router();
-console.log("I am here in driverCreation");
+
 let driverList = [];
 let requestDriverList = [];
 
@@ -11,6 +11,12 @@ class Driver{
         this.isActive = false;
     }
 }
+
+// Test routine
+driverCreationRouter.get('/hello', (req,res)=>{
+    res.send("Welcome to driver creation");
+});
+
 
 driverCreationRouter.post('/forgotPassword', (req,res)=>{
     const phoneNumber = req.body.phoneNumber;
@@ -31,6 +37,7 @@ driverCreationRouter.post('/register',async (req,res)=>{
        res.status(406).send("Driver already exists. Kindly login. ")
     }
     let driver = new Driver(driverName,phoneNumber,password);
+    requestDriverList.push(driver);
     res.status(201).send("Creation request is successful");
 });
 
@@ -40,10 +47,10 @@ driverCreationRouter.post('/login',(req,res)=>{
     const password = req.body.password;
     let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber && driver.password===password );
     if(!driver){
-        res.status(406).send("Driver doesn't exist.")
+        res.status(406).send("Driver doesn't exist.");
+        return;
     }
     driver.isActive = true;
-
     res.status(201).send("login is successful");
 });
 
@@ -51,13 +58,12 @@ driverCreationRouter.post('/logout',(req,res)=>{
     const phoneNumber = req.body.phoneNumber;
     let driver = driverList.find(({ driver }) => driver.phoneNumber === phoneNumber );
     if(!driver){
-        res.status(406).send("Driver doesn't exist.")
+        res.status(406).send("Driver doesn't exist.");
+        return;
     }
     driver.isActive = false;
     res.status(200).send("logout is successful");
 });
-
-
 
 module.exports.router = driverCreationRouter;
 module.exports.driverList = driverList;

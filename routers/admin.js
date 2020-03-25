@@ -1,8 +1,8 @@
 const adminRouter = require('express').Router();
-let driverList = require('driverCreationRouter').driverList;
-let requestDriverList = require('driverCreationRouter').requestDriverList;
+let driverList = require('./driverCreationRouter').driverList;
+let requestDriverList = require('./driverCreationRouter').requestDriverList;
 let driverUtils = require('../utils/DriverCreationUtils');
-let  Driver = require('driverCreationRouter').Driver;
+let  Driver = require('./driverCreationRouter').Driver;
 
 
 adminRouter.get('/allDrivers',(req,res)=>{
@@ -15,7 +15,7 @@ adminRouter.post('/DriverVerified',async (req,res)=>{
     let verifiedDriverList = req.body.verifiedDriverList;
     for (const driver of verifiedDriverList){
         requestDriverList.filter((requestedDriver)=>requestedDriver.phoneNumber == driver.phoneNumber);
-        let newDriver = Driver(driver.driverName, driver.phoneNumber,driver.password);
+        let newDriver = new Driver(driver.driverName, driver.phoneNumber,driver.password);
         driverList.push(newDriver)
     }
     await driverUtils.updateDriversInDB(driverList);
