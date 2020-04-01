@@ -2,13 +2,12 @@ const socket = require('socket.io');
 let driverList = require('./routers/driverCreationRouter').driverList;
 let userList = [];
 
-const updateTimeInterval = 60; // In Seconds
 const queueWaitingTime = 20*60; // In Seconds
 
 module.exports.setupSocket = (server) => {
-    // Automatically remove people from the queue after they have waited for more than queueWaitingTime Seconds
-    // Please change the interval time to an appropriate value
-    // With the current interval, in worst case user will stay in queue for 2*queueWaitingTime seconds
+    // Automatically remove users from the queue after they have waited for more than queueWaitingTime Seconds
+    // Change the interval time to an appropriate value
+    // With the current interval, in worst case, user will stay in queue for 2*queueWaitingTime seconds
     setInterval(() => {
         let numOfUsers = 0;
         while(numOfUsers < userList.length && 
@@ -20,22 +19,26 @@ module.exports.setupSocket = (server) => {
     }, queueWaitingTime*1000);
 
     const io = socket(server);
-    // TO DO: Implement a routine to remove old users from userList after T time interval
-    // 2 Options: 1.) Update after every 1-2 min
-    //            2.) Broadcast the changes instead of broadcasting all the data
 
+    /** ======================================= 
+     * Responses to the User socket Calls
+     ** ========================================*/
     io.on('connection', (socket) => {
-        let userDriverList = {"userList":userList, "driverList":driverList};
-        console.log('made socket connection: ' + socket.id);
+        let userDriverList = {'userList':userList, 'driverList':driverList};
+        console.log(`made socket connection: ${socket.id}`);
+        
+        // Provide base-data (requested while establishing new connetion or while reconnecting)
+        socket.on('baseDataRequest', () => {
+            socket.emit('baseData', userDriverList);
+        });
 
         socket.on('book', (user) => {
             console.log(`BOOK: ${user.id}`);
             userList.push(user);
-            // user.ID == id of the user (socket.id of the user)
             // Confirm Booking
             io.emit('bookResponse', {id: user.id});
-            //            2.) Update after every change  
-            io.emit('updateMapData', userDriverList);
+            // Notify to all 
+            io.emit('addUser', {user: user});
         });
 
         socket.on('unbook', (userID) => {
@@ -44,9 +47,8 @@ module.exports.setupSocket = (server) => {
             userList.splice(index, 1);
             // Confirm UnBook
             io.emit('unbookResponse', {id: userID});
-            // 2 Options: 1.) Update after every 1-2 min
-            //            2.) Update after every change  
-            io.emit('updateMapData', userDriverList);
+            // Notify to all
+            io.emit('removeUser', {id: userID});
         });
 
         socket.on('gotIn', (userID) => {
@@ -57,12 +59,16 @@ module.exports.setupSocket = (server) => {
             userList.splice(index, 1);
             // Confirm GotIn
             io.emit('gotInResponse', {id: userID});
-            // 2 Options: 1.) Update after every 1-2 min
-            //            2.) Update after every change  
-            io.emit('updateMapData', userDriverList);
+            // Notify to all
+            io.emit('removeUser', {id: userID});
         });
 
-        // Implementation of first Option
-        // setInterval(() => {io.emit('updateMapData', userDriverList)}, updateTimeInterval*1000);
+    /** ======================================= 
+     * Responses to the Driver socket Calls (Incomplete)
+     ** ========================================*/
+        socket.on('updateLocation', (driver) => {
+            console.log(`LOCATION_UPDATE: ${driver.id}`);
+        });
+
     });
 }
