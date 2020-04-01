@@ -1,2 +1,9 @@
 # Editor specific settings to be avoided
 .vscode
+
+# Node Specific files
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
