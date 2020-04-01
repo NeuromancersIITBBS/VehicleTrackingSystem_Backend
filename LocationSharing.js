@@ -5,6 +5,8 @@ let userList = [];
 const queueWaitingTime = 20*60; // In Seconds
 
 module.exports.setupSocket = (server) => {
+    const io = socket(server);
+    
     // Automatically remove users from the queue after they have waited for more than queueWaitingTime Seconds
     // Change the interval time to an appropriate value
     // With the current interval, in worst case, user will stay in queue for 2*queueWaitingTime seconds
@@ -12,13 +14,14 @@ module.exports.setupSocket = (server) => {
         let numOfUsers = 0;
         while(numOfUsers < userList.length && 
             Date.now() - userList[numOfUsers].timeStamp > queueWaitingTime*1000){
+            // Send remove user broadcast for these users
+            io.emit('removeUser', {id: userList[numOfUsers].id})
             numOfUsers++;
         }
         userList.splice(0, numOfUsers);
         console.log(`removed ${numOfUsers} users from the queue.`);
     }, queueWaitingTime*1000);
 
-    const io = socket(server);
 
     /** ======================================= 
      * Responses to the User socket Calls
@@ -28,17 +31,17 @@ module.exports.setupSocket = (server) => {
         console.log(`made socket connection: ${socket.id}`);
         
         // Provide base-data (requested while establishing new connetion or while reconnecting)
-        socket.on('baseDataRequest', () => {
-            socket.emit('baseData', userDriverList);
+        socket.on('onConnection', () => {
+            socket.emit('connectionResponse', userDriverList);
         });
 
         socket.on('book', (user) => {
             console.log(`BOOK: ${user.id}`);
             userList.push(user);
             // Confirm Booking
-            io.emit('bookResponse', {id: user.id});
+            socket.emit('bookResponse', {id: user.id});
             // Notify to all 
-            io.emit('addUser', {user: user});
+            socket.broadcast.emit('addUser', user);
         });
 
         socket.on('unbook', (userID) => {
@@ -46,9 +49,9 @@ module.exports.setupSocket = (server) => {
             const index = userList.findIndex(user => user.ID == userID);
             userList.splice(index, 1);
             // Confirm UnBook
-            io.emit('unbookResponse', {id: userID});
+            socket.emit('unbookResponse', {id: userID});
             // Notify to all
-            io.emit('removeUser', {id: userID});
+            socket.broadcast.emit('removeUser', {id: userID});
         });
 
         socket.on('gotIn', (userID) => {
@@ -58,9 +61,9 @@ module.exports.setupSocket = (server) => {
             const index = userList.findIndex(user => user.ID == userID);
             userList.splice(index, 1);
             // Confirm GotIn
-            io.emit('gotInResponse', {id: userID});
+            socket.emit('gotInResponse', {id: userID});
             // Notify to all
-            io.emit('removeUser', {id: userID});
+            socket.broadcast.emit('removeUser', {id: userID});
         });
 
     /** ======================================= 
