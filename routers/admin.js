@@ -1,5 +1,7 @@
 const adminRouter = require('express').Router();
 let driverList = require('./driverCreationRouter').driverList;
+let driverListSocketV = require('./driverCreationRouter').driverListSocketV;
+let transformToDriverSocketV = require('./driverCreationRouter').transformToDriverSocketV;
 let requestDriverList = require('./driverCreationRouter').requestDriverList;
 let driverUtils = require('../utils/DriverCreationUtils');
 let  Driver = require('./driverCreationRouter').Driver;
@@ -22,6 +24,8 @@ adminRouter.post('/DriverVerified',async (req,res)=>{
             // Add newDriver in the driverList and remove it from requestDriverList
             driverList.push(newDriver);
             requestDriverList.splice(index, 1);
+            // Add newDriver in socketV list
+            driverListSocketV.push(transformToDriverSocketV(newDriver));
         }else{
             console.warn('newDriver does not exist in requestedDriverList');
         }
@@ -34,7 +38,7 @@ adminRouter.post('/DriverVerified',async (req,res)=>{
 adminRouter.delete('/deleteDriver',async (req,res)=>{
     let phoneNumber = req.body.phoneNumber;
     // Find the driver in the array
-    let index = driverList.findIndex((driver)=>driver.phoneNumber == phoneNumber);
+    let index = driverList.findIndex((driver)=>driver.phoneNumber === phoneNumber);
     if(index == -1){
         res.status(406).send("Driver does not exist/Driver is not yet verified");
         return;
@@ -42,6 +46,13 @@ adminRouter.delete('/deleteDriver',async (req,res)=>{
     // remove it
     driverList.splice(index, 1);
     await driverUtils.updateDriversInDB(driverList);
+    // Remove the driver from the driverListSocketV
+    let indV = driverListSocketV.findIndex((driver) => driver.phoneNumber === phoneNumber);
+    if(indV != -1){
+        driverListSocketV.splice(indV, 1);
+    } else{
+        console.warn(`driverListSocketV and driverList are not in sync`);
+    }
     res.status(200).send("successfully deleted new drivers");
 });
 
