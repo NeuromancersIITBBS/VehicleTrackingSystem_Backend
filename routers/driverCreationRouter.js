@@ -1,4 +1,5 @@
 const driverCreationRouter = require('express').Router();
+const verifyDriver = require('../utils/middleware').verifyDriver;
 const auth = require('../utils/jwtauth');
 let driverUtils = require('../utils/DriverCreationUtils');
 
@@ -114,16 +115,8 @@ driverCreationRouter.post('/login',(req,res)=>{
 });
 
 // Test Route (To be removed)
-driverCreationRouter.get('/verify', (req, res) => {
-    if(!req.headers.authorization){
-        return res.sendStatus(401);
-    }
-    const token = req.headers.authorization.split(" ")[1];
-    const driver = auth.verifyInfo(token);
-    if(!driver){
-        return res.sendStatus(401);
-    }
-    res.status(200).json(driver);
+driverCreationRouter.get('/verify', verifyDriver, (req, res) => {
+    res.status(200).json(res.locals.driver);
 });
 
 driverCreationRouter.post('/logout',(req,res)=>{

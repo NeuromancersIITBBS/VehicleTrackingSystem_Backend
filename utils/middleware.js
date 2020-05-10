@@ -1,3 +1,19 @@
+const auth = require('./jwtauth');
+
+const verifyDriver = (req, res, next) => {
+    if(!req.headers.authorization){
+        return res.sendStatus(401);
+    }
+    const token = req.headers.authorization.split(" ")[1];
+    const driver = auth.verifyInfo(token);
+    if(!driver){
+        return res.sendStatus(401);
+    }
+    // Attach driver's info
+    res.locals.driver = driver;
+    next();
+};
+
 const requestLogger = (req, res, next) => {
     console.log("--------------------------------------------------");
     console.log("Request Method: "+ req.method);
@@ -18,6 +34,7 @@ const errorHandler = (err, req, res, next) => {
 };
 
 module.exports = {
+    verifyDriver,
     requestLogger,
     unknownEndpoint,
     errorHandler
