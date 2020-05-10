@@ -1,4 +1,5 @@
 const driverCreationRouter = require('express').Router();
+const auth = require('../utils/jwtauth');
 let driverUtils = require('../utils/DriverCreationUtils');
 
 let driverList = [];
@@ -105,7 +106,24 @@ driverCreationRouter.post('/login',(req,res)=>{
         driverSocketV = driver;
     }
     driverSocketV.isActive = true;
-    res.status(201).send("login is successful");
+    const driverInfo = {
+        phoneNumber: phoneNumber,
+        timeStamp: Date.now()
+    }
+    res.status(201).json({token: auth.signInfo(driverInfo, '120s')});
+});
+
+// Test Route (To be removed)
+driverCreationRouter.get('/verify', (req, res) => {
+    if(!req.headers.authorization){
+        return res.sendStatus(401);
+    }
+    const token = req.headers.authorization.split(" ")[1];
+    const driver = auth.verifyInfo(token);
+    if(!driver){
+        return res.sendStatus(401);
+    }
+    res.status(200).json(driver);
 });
 
 driverCreationRouter.post('/logout',(req,res)=>{

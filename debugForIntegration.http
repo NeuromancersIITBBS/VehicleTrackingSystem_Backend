@@ -3,6 +3,9 @@
 # This file can only be used in VSCode.
 
 
+// Verify Driver
+GET http://localhost:3000/vts/new_driver/verify
+Authorization: token eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6IjEyMzQ1Njc4OTAiLCJ0aW1lU3RhbXAiOjE1ODkxMTc1NzcxNzksImlhdCI6MTU4OTExNzU3NywiZXhwIjoxNTg5MTE3Njk3fQ.DbvmHUFo6kSCv2LsTnUbVg_HeWN4780EGDkyqZ50cUGyWcg6xxGEC8nsjdPayUcxcCkMRHp4ch8QSAjwkAYK8w
 
 ### New driver request 
 GET http://localhost:3000/vts/new_driver/hello
