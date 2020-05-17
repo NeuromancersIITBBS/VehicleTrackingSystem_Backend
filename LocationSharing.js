@@ -1,6 +1,8 @@
 const socket = require('socket.io');
 let driverList = require('./routers/driverCreationRouter').driverList;
-let driverListSocketV = require('./routers/driverCreationRouter').driverListSocketV;
+let Driver = require('./Model/Driver');
+const auth = require('./utils/jwtauth');
+let activeDrivers = [];
 let userList = [];
 let tokenID = 0;
 
@@ -32,7 +34,7 @@ module.exports.setupSocket = (server) => {
      * Responses to the User socket Calls
      ** ========================================*/
     io.on('connection', (socket) => {
-        let userDriverList = {'userList':userList, 'driverList':driverListSocketV};
+        let userDriverList = {userList:userList, driverList:activeDrivers};
         console.log(`made socket connection: ${socket.id}`);
         
         // Provide base-data (requested while establishing new connetion or while reconnecting)
@@ -45,7 +47,7 @@ module.exports.setupSocket = (server) => {
             console.log(`BOOK: ${user.id}`);
             userList.push(user);
             // Confirm Booking
-            socket.emit('bookResponse', {id: user.id});
+            socket.emit('bookResponse', user);
             // Notify to all 
             socket.broadcast.emit('addUser', user);
         });
@@ -75,61 +77,80 @@ module.exports.setupSocket = (server) => {
     /** ======================================= 
      * Responses to the Driver socket Calls
      ** ========================================*/
-        socket.on('updateDriverLocation', (driver) => {
-            // Fetch the drive by phoneNumber
-            const driverRef = driverList.find((tmpDriver) => tmpDriver.phoneNumber === driver.phoneNumber);
-            // Guard-Clause
-            if(!driverRef){
-                socket.emit('DriverAuthFailed', {message: 'Driver does not exist'});
+
+        socket.on('registerDriver', (driver) => {
+            // Verify JWT token
+            const driverInfo = auth.verifyInfo(driver.token);
+            
+            if(!driverInfo){
+                // If unsuccessful send Auth failed
+                socket.emit('driverAuthFailed', {message: 'Login Again!'});
                 return;
             }
-            // Verify the driver data
-            const keyVal = driverRef.phoneNumber+driverRef.password.substr(0, driverRef.password.length-2);
-            if(driver.key !== keyVal){
-                socket.emit('DriverAuthFailed', {message: 'Wrong key used'});
+            if(activeDrivers.find(driverData => driverData.phoneNumber === driverInfo.phoneNumber)){
+                // Driver already exists
                 return;
             }
-            // Update in the driverListSocketV array
-            let driverRefSocket = driverListSocketV.find((tmpDriver) => tmpDriver.phoneNumber === driver.phoneNumber);
-            driverRefSocket.location.location = driver.location.location;
-            // Emit to all and give confirmation to the driver
-            socket.emit('updateDriverLocationResponse');
-            const updatedData = {
-                phoneNumber: driver.phoneNumber,
-                location: driver.location
-            };
-            socket.broadcast.emit('updateDriverLocation', updatedData);
+
+            // Add driver in activeDriversList
+            const newDriver = new Driver(driverInfo.phoneNumber, driver.location, Date.now());
+            activeDrivers.push(newDriver);
+
+            // Send updateDriverData broadcast to all
+            socket.emit('updateDriverData', newDriver);
         });
 
-        socket.on('updateDriverData', (driver) => {
-            // Fetch the drive by phoneNumber
-            const driverRef = driverList.find((tmpDriver) => tmpDriver.phoneNumber === driver.phoneNumber);
-            // Guard-Clause
-            if(!driverRef){
-                socket.emit('DriverAuthFailed', {message: 'Driver does not exist'});
+        socket.on('updateDriverLocation', (driverData) => {
+            // Verify JWT token
+            const driverInfo = auth.verifyInfo(driverData.token);
+
+            if(!driverInfo){
+                // If unsuccessful send Auth failed
+                socket.emit('driverAuthFailed', {message: 'Login Again!'});
                 return;
             }
-            // Verify the driver data
-            const keyVal = driverRef.phoneNumber+driverRef.password.substr(0, driverRef.password.length-2);
-            if(driver.key !== keyVal){
-                socket.emit('DriverAuthFailed', {message: 'Wrong key used'});
+            // Find driver in activeDrivers list
+            const driver = activeDrivers.find(tmpDriver => tmpDriver.phoneNumber === driverInfo.phoneNumber);
+            if(!driver){
+                // If unsuccessful send Auth failed
+                socket.emit('driverAuthFailed', {message: 'Login Again!'});
                 return;
             }
-            // Update in the driverListSocketV array
-            let driverRefSocket = driverListSocketV.find((tmpDriver) => tmpDriver.phoneNumber === driver.phoneNumber);
-            driverRefSocket.location.location = driver.location.location;
-            driverRefSocket.occupiedSeats = driver.occupiedSeats;
-            // Emit to all and give confirmation to the driver
-            socket.emit('updateDriverLocationResponse');
-            const updatedData = {
-                phoneNumber: driver.phoneNumber,
-                location: driver.location,
-                occupiedSeats: driver.occupiedSeats
-            };
-            socket.broadcast.emit('updateDriverData', updatedData);
+
+            // Update location
+            driver.updateLocation(driverData);
+
+            // send updateLocation broadcast to all
+            socket.emit('updateDriverLocation', {
+                location: driver.location, 
+                phoneNumber:driver.phoneNumber,
+                timeStamp: driver.timeStamp
+            });
+            
         });
-        socket.on('updateDriverData', (driver) => {
-            console.log(driver);
+
+        socket.on('updateDriverData', (driverData) => {
+            // Verify JWT token
+            const driverInfo = auth.verifyInfo(driverData.token);
+
+            if(!driverInfo){
+                // If unsuccessful send Auth failed
+                socket.emit('driverAuthFailed', {message: 'Login Again!'});
+                return;
+            }
+            // Find driver in activeDrivers list
+            const driver = activeDrivers.find(tmpDriver => tmpDriver.phoneNumber === driverInfo.phoneNumber);
+            if(!driver){
+                // If unsuccessful send Auth failed
+                socket.emit('driverAuthFailed', {message: 'Login Again!'});
+                return;
+            }
+
+            // Update data
+            driver.updateData(driverData);
+
+            // send updateLocation broadcast to all
+            socket.emit('updateDriverData', driver);
         });
     });
 }
