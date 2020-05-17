@@ -117,7 +117,7 @@ module.exports.setupSocket = (server) => {
             driver.updateLocation(driverData);
             console.log(`UPDATE LOCATION: ${driver.phoneNumber}`);
             // send updateLocation broadcast to all
-            socket.emit('updateDriverLocation', {
+            io.emit('updateDriverLocation', {
                 location: driver.location, 
                 phoneNumber:driver.phoneNumber,
                 timeStamp: driver.timeStamp
@@ -144,7 +144,7 @@ module.exports.setupSocket = (server) => {
             driver.updateData(driverData);
             // send updateLocation broadcast to all
             console.log(`UPDATE DATA: ${driver.phoneNumber}`);
-            socket.emit('updateDriverData', driver);
+            io.emit('updateDriverData', driver);
         });
     });
 }

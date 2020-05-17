@@ -28,17 +28,6 @@ class Driver{
     }
 }
 
-// The object which would be used in broadcast
-
-
-// This method is used for making a deep copy of the driver 
-// It removes the password from the user object
-// Making it safe for sending to all the users
-// let transformToDriverSocketV = (driver) => {
-//     let driverSocket = new DriverSocketV(driver.driverName, driver.phoneNumber);
-//     return driverSocket;
-// };
-
 // Test routine
 driverCreationRouter.get('/hello', (req,res)=>{
     res.send("Welcome to driver creation");
