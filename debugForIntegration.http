@@ -50,8 +50,7 @@ content-type: application/json
 
 {
     "driverName": "Raj",
-    "phoneNumber": "1234567890",
-    "password": "myPass"
+    "phoneNumber": "1234567890"
 }
 
 
