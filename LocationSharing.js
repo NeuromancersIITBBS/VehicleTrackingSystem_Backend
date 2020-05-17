@@ -10,7 +10,7 @@ const queueWaitingTime = 20*60; // In Seconds
 const tokenIDResetTime = 2*24*60*60; // In Seconds
 
 module.exports.setupSocket = (server) => {
-    const io = socket(server);
+    const io = socket(server, {cookie: false});
     
     // Automatically remove users from the queue after they have waited for more than queueWaitingTime Seconds
     // Change the interval time to an appropriate value
@@ -81,7 +81,6 @@ module.exports.setupSocket = (server) => {
         socket.on('registerDriver', (driver) => {
             // Verify JWT token
             const driverInfo = auth.verifyInfo(driver.token);
-            
             if(!driverInfo){
                 // If unsuccessful send Auth failed
                 socket.emit('driverAuthFailed', {message: 'Login Again!'});
@@ -91,19 +90,17 @@ module.exports.setupSocket = (server) => {
                 // Driver already exists
                 return;
             }
-
             // Add driver in activeDriversList
             const newDriver = new Driver(driverInfo.phoneNumber, driver.location, Date.now());
             activeDrivers.push(newDriver);
-
-            // Send updateDriverData broadcast to all
-            socket.emit('updateDriverData', newDriver);
+            console.log(`REGISTER DRIVER: ${newDriver.phoneNumber}`);
+            // Send addDriver broadcast to all
+            io.emit('addDriver', newDriver);
         });
 
         socket.on('updateDriverLocation', (driverData) => {
             // Verify JWT token
             const driverInfo = auth.verifyInfo(driverData.token);
-
             if(!driverInfo){
                 // If unsuccessful send Auth failed
                 socket.emit('driverAuthFailed', {message: 'Login Again!'});
@@ -116,10 +113,9 @@ module.exports.setupSocket = (server) => {
                 socket.emit('driverAuthFailed', {message: 'Login Again!'});
                 return;
             }
-
             // Update location
             driver.updateLocation(driverData);
-
+            console.log(`UPDATE LOCATION: ${driver.phoneNumber}`);
             // send updateLocation broadcast to all
             socket.emit('updateDriverLocation', {
                 location: driver.location, 
@@ -128,11 +124,10 @@ module.exports.setupSocket = (server) => {
             });
             
         });
-
+        
         socket.on('updateDriverData', (driverData) => {
             // Verify JWT token
             const driverInfo = auth.verifyInfo(driverData.token);
-
             if(!driverInfo){
                 // If unsuccessful send Auth failed
                 socket.emit('driverAuthFailed', {message: 'Login Again!'});
@@ -145,11 +140,10 @@ module.exports.setupSocket = (server) => {
                 socket.emit('driverAuthFailed', {message: 'Login Again!'});
                 return;
             }
-
             // Update data
             driver.updateData(driverData);
-
             // send updateLocation broadcast to all
+            console.log(`UPDATE DATA: ${driver.phoneNumber}`);
             socket.emit('updateDriverData', driver);
         });
     });
