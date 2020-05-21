@@ -73,7 +73,7 @@ driverCreationRouter.post('/login',(req,res)=>{
         phoneNumber: phoneNumber,
         timeStamp: Date.now()
     }
-    res.status(201).json({token: auth.signInfo(driverInfo, '10m')});
+    res.status(201).json({token: auth.signInfo(driverInfo, '3h')});
 });
 
 // Test Route (To be removed)

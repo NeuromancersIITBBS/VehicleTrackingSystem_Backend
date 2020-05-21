@@ -30,7 +30,7 @@ const unknownEndpoint = (req, res) => {
 const errorHandler = (err, req, res, next) => {
     console.log(err);
     console.log(err.stack);
-    next();
+    res.sendStatus(500);
 };
 
 module.exports = {
