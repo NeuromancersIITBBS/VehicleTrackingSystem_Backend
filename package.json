@@ -1,7 +1,7 @@
 {
   "name": "vehicletrackingsystem",
   "version": "1.0.0",
-  "description": "Server used for Tracking inistitue vehicles",
+  "description": "Server used for Tracking institute vehicles",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index",
