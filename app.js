@@ -2,9 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const driverCreationRouter = require('./routers/driverCreationRouter').router;
-const middleware = require('./utils/middleware');
-
 const adminRouter = require('./routers/admin');
+const middleware = require('./utils/middleware');
 
 app.use(express.json());
 app.use(cors());
