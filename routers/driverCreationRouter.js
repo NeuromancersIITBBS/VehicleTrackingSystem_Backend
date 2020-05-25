@@ -2,6 +2,7 @@ const driverCreationRouter = require('express').Router();
 const verifyDriver = require('../utils/middleware').verifyDriver;
 const auth = require('../utils/jwtauth');
 const db = require('../utils/database');
+const bcrypt = require('bcrypt');
 
 const requestDriverList = [];
 
@@ -26,9 +27,9 @@ driverCreationRouter.post('/forgotPassword', async (req,res, next)=>{
 
 driverCreationRouter.post('/register',async (req,res, next)=>{
     try{
-        const driverName = req.body.name;
+        const driverName = req.body.driverName;
         const phoneNumber = req.body.phoneNumber;
-        const password = req.body.password;
+        const plainPassword = req.body.password;
     
         const driverRef = await db.getDriver(req.body.phoneNumber);
         const driverCheck = driverRef.data[0];
@@ -40,6 +41,8 @@ driverCreationRouter.post('/register',async (req,res, next)=>{
             res.status(406).json({message: "Driver already registerd once. Kindly wait for the verification."});
             return;
         }
+        // Hash the plainPassword using bcrypt
+        const password = await bcrypt.hash(plainPassword, 10);
         let driver = {driverName, phoneNumber, password};
         requestDriverList.push(driver);
         res.status(201).json({message: "Creation request is successful"});
@@ -54,7 +57,12 @@ driverCreationRouter.post('/login', async (req,res, next)=>{
         const password = req.body.password;
         const driverRef = await db.getDriver(phoneNumber);
         const driverCheck = driverRef.data[0];
-        if(!driverCheck || driverCheck.password != password){
+        if(!driverCheck){
+            res.status(406).json({message: "Login failed!"});
+            return;
+        }
+        const match = await bcrypt.compare(password, driverCheck.password);
+        if(!match){
             res.status(406).json({message: "Login failed!"});
             return;
         }

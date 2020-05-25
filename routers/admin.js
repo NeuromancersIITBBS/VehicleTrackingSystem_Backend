@@ -22,8 +22,9 @@ adminRouter.post('/DriverVerified',async (req,res, next)=>{
         for (const driver of verifiedDriverList){
             let index = requestDriverList.findIndex((requestedDriver) => requestedDriver.phoneNumber == driver.phoneNumber);
             if(index != -1){
+                const newDriver = requestDriverList[index];
                 // Add newDriver in the driverList and remove it from requestDriverList
-                await db.addDriver(driver);
+                await db.addDriver(newDriver);
                 requestDriverList.splice(index, 1);
                 
             }else{
