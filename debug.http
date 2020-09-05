@@ -14,8 +14,8 @@ content-type: application/json
 
 {
     "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "phoneNumber": "1234567899",
+    "password": "myPass2"
 }
 
 
@@ -25,8 +25,8 @@ content-type: application/json
 
 {
     "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "phoneNumber": "1234567899",
+    "password": "myPass2"
 }
 
 
@@ -36,21 +36,14 @@ content-type: application/json
 
 {
     "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "phoneNumber": "1234567899",
+    "password": "myPass2"
 }
 
 
 ###  Logout
-POST http://localhost:3000/vts/new_driver/logout
-content-type: application/json
-
-{
-    "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
-}
-
+GET http://localhost:3000/vts/new_driver/logout
+Authorization: token eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6IjEyMzQ1Njc4OTkiLCJ0aW1lU3RhbXAiOjE1OTIwNTQ0MjY4ODMsImlhdCI6MTU5MjA1NDQyNiwiZXhwIjoxNTkyMDY1MjI2fQ.P0CZhmTmKTcCywnW3oRqEwJbF1pc8G9HFZdhrk5IRUtufOWH-Iy9lHkPWRLc09jMuxvV6X1lqzUu8NRqB8QEyw
 
 ### Get all drivers
 GET http://localhost:3000/vts/admin/allDrivers
@@ -66,8 +59,8 @@ content-type: application/json
 
 {
     "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "phoneNumber": "1234567899",
+    "password": "myPass2"
 }
 
 ### Reject new driver
@@ -76,8 +69,8 @@ content-type: application/json
 
 {
     "driverName": "XYZ",
-    "phoneNumber": "53466565547",
-    "password": "!@#$"
+    "phoneNumber": "1234567899",
+    "password": "myPass2"
 }
 
 ### Verified driver
@@ -85,7 +78,7 @@ POST http://localhost:3000/vts/admin/DriverVerified
 content-type: application/json
 
 {
-    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "53466565547", "password": "!@#$"}]
+    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "1234567899", "password": "myPass2"}]
 }
 
 ### Verified all drivers
@@ -93,6 +86,6 @@ POST http://localhost:3000/vts/admin/DriverVerified
 content-type: application/json
 
 {
-    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "53466565547", "password": "!@#$"},
+    "verifiedDriverList": [{"driverName": "XYZ", "phoneNumber": "1234567899", "password": "myPass2"},
     {"driverName": "ABC", "phoneNumber": "1234567890", "password": "myPass!!!"}]
 }

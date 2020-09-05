@@ -1,7 +1,7 @@
 class Driver{
     constructor(number, location, timeStamp){
         this.phoneNumber = number;
-        this.status = 'inactive';
+        this.status = 'active';
         this.occupiedSeats = 0;
         this.location = location;
         this.destination = null;

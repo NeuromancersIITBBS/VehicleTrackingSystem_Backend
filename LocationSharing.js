@@ -8,9 +8,18 @@ let tokenID = 0;
 const queueWaitingTime = 20*60; // In Seconds
 const tokenIDResetTime = 2*24*60*60; // In Seconds
 const driverWaitingTime = 20*60 // In Seconds
+let io;
+
+module.exports.removeDriver = (phoneNumber) => {
+    const driverID = activeDrivers.findIndex(driver => driver.phoneNumber === phoneNumber);
+    if(driverID !== -1){
+        activeDrivers.splice(driverID, 1);
+        io.emit('removeDriver', {phoneNumber});
+    }
+}
 
 module.exports.setupSocket = (server) => {
-    const io = socket(server, {cookie: false});
+    io = socket(server, {cookie: false});
     
     // Automatically remove users from the queue after they have waited for more than queueWaitingTime Seconds
     // Change the interval time to an appropriate value
@@ -62,28 +71,54 @@ module.exports.setupSocket = (server) => {
             user.id = tokenID++;
             console.log(`BOOK: ${user.id}`);
             userList.push(user);
+            // Generate token (conains userID and timeStamp) and add it to bookRespose
+            const token = auth.signInfo({id: user.id, timeStamp: Date.now()}, queueWaitingTime);
             // Confirm Booking
-            socket.emit('bookResponse', user);
-            // Notify to all 
+            socket.emit('bookResponse', {...user, token});
+            // Notify to all (don't emit token to all)
             socket.broadcast.emit('addUser', user);
         });
 
-        socket.on('unbook', (userID) => {
+        socket.on('unbook', (userToken) => {
+            // Validate Token
+            const userInfo = auth.verifyInfo(userToken);
+            const userID = userInfo.id;
+            if(!userInfo || userID === null){
+                // Invalid token
+                socket.emit('userAuthFailed');
+                return;
+            }
             console.log(`UNBOOK: ${userID}`);
             const index = userList.findIndex(user => user.id == userID);
-            userList.splice(index, 1);
+            // Remove user from the user array
+            if(index !== -1){
+                userList.splice(index, 1);
+            } else{
+                console.warn(`USER ID ${userID} is not present in users array!`);
+            }
             // Confirm UnBook
             socket.emit('unbookResponse', {id: userID});
             // Notify to all
             socket.broadcast.emit('removeUser', {id: userID});
         });
 
-        socket.on('gotIn', (userID) => {
-            // Works same as unbook
-            // Can be used to determine the destination of the BOV
-            console.log(`GOTIN: ${userID}`);
+        socket.on('gotIn', (userToken) => {
+            // Validate Token
+            const userInfo = auth.verifyInfo(userToken);
+            const userID = userInfo.id;
+            if(!userInfo || userID === null){
+                // Invalid token
+                socket.emit('userAuthFailed');
+                return;
+            }
+            console.log(`GOT IN: ${userID}`);
             const index = userList.findIndex(user => user.id == userID);
-            userList.splice(index, 1);
+            // Remove user from the user array
+            if(index !== -1){
+                userList.splice(index, 1);
+            } else{
+                console.warn(`USER ID ${userID} is not present in users array!`);
+            }
             // Confirm GotIn
             socket.emit('gotInResponse', {id: userID});
             // Notify to all
@@ -161,6 +196,10 @@ module.exports.setupSocket = (server) => {
             // send updateLocation broadcast to all
             console.log(`UPDATE DATA: ${driver.phoneNumber}`);
             io.emit('updateDriverData', driver);
+        });
+
+        socket.on('driverLogOut', (driverData) => {
+            io.emit('removeDriver', {phoneNumber: driverData.phoneNumber});
         });
     });
 }

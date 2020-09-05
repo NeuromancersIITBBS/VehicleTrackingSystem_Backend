@@ -3,6 +3,7 @@ const verifyDriver = require('../utils/middleware').verifyDriver;
 const auth = require('../utils/jwtauth');
 const db = require('../utils/database');
 const bcrypt = require('bcrypt');
+const removeDriver = require('../LocationSharing').removeDriver;
 
 const requestDriverList = [];
 
@@ -82,15 +83,16 @@ driverCreationRouter.get('/verify', verifyDriver, async (req, res) => {
     res.status(200).json(res.locals.driver);
 });
 
-driverCreationRouter.post('/logout', async (req,res, next)=>{
+driverCreationRouter.get('/logout', verifyDriver, async (req,res, next)=>{
     try{
-        const phoneNumber = req.body.phoneNumber;
+        const phoneNumber = res.locals.driver.phoneNumber;
         const driverRef = await db.getDriver(phoneNumber);
         const driverCheck = driverRef.data[0];
         if(!driverCheck || !driverCheck.isActive){
             res.status(406).json({message: "Driver doesn't exist."});
             return;
         }
+        removeDriver(phoneNumber);
         await db.setActiveStatus(phoneNumber, false);
         res.status(200).json({message: "logout is successful"});
     }catch(e){
