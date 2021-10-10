@@ -9,6 +9,10 @@ The prototype has already been been tested. In the prototype, the location is tr
 
 The phase 2 of the project will see this work done by IoT GPS enabled camera which will identify seats occupied using computer vision and send its location, solving the hassle of wires and bigger equipment.
 
+To run the server
+
+```npm start ```
+
 ## API calls
 
 ## Socket Broadcasts
