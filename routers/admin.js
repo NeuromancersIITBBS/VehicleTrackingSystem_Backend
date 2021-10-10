@@ -66,8 +66,9 @@ adminRouter.delete('/rejectDriver',async (req,res, next)=>{
         } 
         // remove it
         requestDriverList.splice(index, 1);
-        res.status(200).json({message: "successfully deleted new drivers"});
+        res.status(202).json({message: "successfully deleted new drivers"});
     }catch(e){
+        console.log(e);
         next(e);
     }
 });
